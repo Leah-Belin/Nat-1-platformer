@@ -12,7 +12,7 @@ const CHARS = [
     id: 'brandan',
     name: 'Brandan Roberts',
     tagline: 'Board President',
-    portrait:   PORT('BrandanRoberts_Portrait1.png'),
+    portrait:   'https://i0.wp.com/nat1publishing.com/wp-content/uploads/2022/03/brandan.png?w=300&ssl=1',
     shirt:      '#2a62a0',
     pants:      '#1a1a2a',
     skin:       '#c8825a',
