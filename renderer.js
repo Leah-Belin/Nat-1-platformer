@@ -1,5 +1,19 @@
 'use strict';
 
+// ─── Portrait image cache ─────────────────────────────────────────────────────
+const _portImgs = {};  // char.id → HTMLImageElement
+
+function preloadPortraits() {
+  for (const ch of CHARS) {
+    if (!ch.portrait) continue;
+    const img = new Image();
+    // crossOrigin lets drawImage work even for same-site external images
+    img.crossOrigin = 'anonymous';
+    img.src = ch.portrait;
+    _portImgs[ch.id] = img;
+  }
+}
+
 // ─── Palette ──────────────────────────────────────────────────────────────────
 const PAL = {
   brickBase:  '#4a7ea8',
@@ -538,12 +552,26 @@ function drawSelect(ctx, t) {
     ctx.lineWidth = selected ? 3 : 1;
     ctx.strokeRect(cx, cy, cardW, cardH);
 
-    // Draw mini character
-    const charCX   = cx + cardW / 2;
-    const charFeetY = cy + 120;
-    ctx.save();
-    _drawChar(ctx, charCX, charFeetY, ch, Math.floor(t * 6) % 4, false, t);
-    ctx.restore();
+    // Draw portrait image if loaded, otherwise fall back to pixel-art character
+    const portImg = _portImgs[ch.id];
+    const portraitAreaH = 120;
+    if (portImg && portImg.complete && portImg.naturalWidth > 0) {
+      const scale = Math.min(cardW / portImg.naturalWidth, portraitAreaH / portImg.naturalHeight);
+      const iw = portImg.naturalWidth  * scale;
+      const ih = portImg.naturalHeight * scale;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(cx, cy, cardW, portraitAreaH);
+      ctx.clip();
+      ctx.drawImage(portImg, cx + (cardW - iw) / 2, cy + (portraitAreaH - ih) / 2, iw, ih);
+      ctx.restore();
+    } else {
+      const charCX    = cx + cardW / 2;
+      const charFeetY = cy + 115;
+      ctx.save();
+      _drawChar(ctx, charCX, charFeetY, ch, Math.floor(t * 6) % 4, false, t);
+      ctx.restore();
+    }
 
     // Name (wrap long names to two lines)
     ctx.fillStyle = selected ? PAL.textYellow : PAL.textWhite;
@@ -581,22 +609,24 @@ function drawSelect(ctx, t) {
 function drawZoneHints(ctx) {
   const zH = 36;
   const zY = CH - zH;
-  const third = CW / 3;
+  const lEdge = CW * 0.25;
+  const rEdge = CW * 0.75;
 
   ctx.save();
-  ctx.globalAlpha = 0.12;
+  ctx.globalAlpha = 0.11;
   ctx.fillStyle = '#4488ff';
-  ctx.fillRect(0,         zY, third, zH);
-  ctx.fillRect(third * 2, zY, third, zH);
+  ctx.fillRect(0,     zY, lEdge,        zH);  // left walk zone
+  ctx.fillRect(rEdge, zY, CW - rEdge,   zH);  // right walk zone
   ctx.fillStyle = '#44cc88';
-  ctx.fillRect(third,     zY, third, zH);
-  ctx.globalAlpha = 0.45;
+  ctx.fillRect(lEdge, zY, rEdge - lEdge, zH); // center tap zone
+
+  ctx.globalAlpha = 0.50;
   ctx.fillStyle = '#ffffff';
-  ctx.font = '13px "Courier New"';
+  ctx.font = '11px "Courier New"';
   ctx.textAlign = 'center';
-  ctx.fillText('◀',    third / 2,          zY + 23);
-  ctx.fillText('JUMP', CW / 2,              zY + 23);
-  ctx.fillText('▶',    third * 2 + third / 2, zY + 23);
+  ctx.fillText('HOLD ◀',              lEdge / 2,          zY + 23);
+  ctx.fillText('TAP: JUMP / LADDER',  CW / 2,             zY + 23);
+  ctx.fillText('HOLD ▶',              rEdge + (CW - rEdge) / 2, zY + 23);
   ctx.restore();
 }
 
