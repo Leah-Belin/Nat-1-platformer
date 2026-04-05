@@ -5,21 +5,98 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
+  touch-action: none;
   font-family: 'Courier New', Courier, monospace;
 }
 
 #wrap {
   position: relative;
   line-height: 0;
-  box-shadow: 0 0 40px rgba(80, 140, 200, 0.3);
+  /* Maintain 800:600 aspect ratio, fill available space */
+  width:  min(100dvw, calc(100dvh * 800 / 600));
+  height: min(100dvh, calc(100dvw * 600 / 800));
 }
 
 canvas {
   display: block;
+  width: 100%;
+  height: 100%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  max-width: 100vw;
-  max-height: 100vh;
+  touch-action: none;
+}
+
+/* ── Touch controls ───────────────────────────────────────── */
+#touch-ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: none;           /* shown via JS on touch devices */
+}
+
+.tbtn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.30);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.80);
+  font-size: min(22px, 5vmin);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+  width:  min(64px, 14vmin);
+  height: min(64px, 14vmin);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tbtn:active {
+  background: rgba(255, 255, 255, 0.38);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* D-pad — bottom left */
+#dpad {
+  position: absolute;
+  bottom: min(28px, 5%);
+  left:   min(28px, 5%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: min(6px, 1.5vmin);
+  pointer-events: none;
+}
+
+.dpad-row {
+  display: flex;
+  gap: min(6px, 1.5vmin);
+}
+
+/* Jump — bottom right */
+#action-pad {
+  position: absolute;
+  bottom: min(28px, 5%);
+  right:  min(28px, 5%);
+  pointer-events: none;
+}
+
+.tbtn-jump {
+  width:  min(90px, 20vmin) !important;
+  height: min(90px, 20vmin) !important;
+  border-radius: 50%;
+  font-size: min(13px, 3vmin) !important;
+  font-weight: bold;
+  letter-spacing: 1px;
+  background: rgba(220, 60, 60, 0.28);
+  border-color: rgba(255, 120, 120, 0.45);
+  color: rgba(255, 200, 200, 0.90);
+}
+
+.tbtn-jump:active {
+  background: rgba(255, 80, 80, 0.50);
 }
