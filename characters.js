@@ -1,33 +1,34 @@
 'use strict';
 
 // ── Nat 1 Publishing Board Members ───────────────────────────────────────────
+// To use portrait images: save each image to a portraits/ folder in the project
+// (e.g. portraits/brandan.png) then set portrait: 'portraits/brandan.png'
 const CHARS = [
   // ── Voting Board ─────────────────────────────────────────────────────
-  // portrait: fill in with the image URL from nat1publishing.com/about/masthead/
-  // e.g. portrait: 'https://nat1publishing.com/wp-content/uploads/.../brandan.jpg'
   {
     id: 'brandan',
     name: 'Brandan Roberts',
     tagline: 'Board President',
-    portrait:   null,
-    shirt:      '#1a5c8a',
+    portrait:   null,  // save image as portraits/brandan.png
+    shirt:      '#2a62a0',  // blue shirt + tie
     pants:      '#1a1a2a',
-    skin:       '#d4956a',
-    hair:       '#1a1a1a',
+    skin:       '#c8825a',
+    hair:       '#2a1a10',  // dark brown, long-ish
     shoe:       '#1a1a1a',
     hasGlasses: true,
     hasBeard:   true,
-    hasHat:     false,
+    hasHat:     true,
+    hat:        '#1a1a1a',  // flat dark cap
   },
   {
     id: 'dahlia',
     name: 'Dahlia Thomas',
     tagline: 'Board Director',
     portrait:   null,
-    shirt:      '#3a0a5a',
+    shirt:      '#2a2a3a',  // dark scarf/collar
     pants:      '#1a0a2a',
-    skin:       '#c8956c',
-    hair:       '#1a1a1a',
+    skin:       '#e0b090',
+    hair:       '#2a1008',  // rich dark brown, wavy
     shoe:       '#0a0a0a',
     hasGlasses: false,
     hasBeard:   false,
@@ -52,26 +53,26 @@ const CHARS = [
     name: 'Jennifer Weigel',
     tagline: 'Board Director, Artist',
     portrait:   null,
-    shirt:      '#3a2a5a',
-    pants:      '#1a1a2a',
+    shirt:      '#6a1a8a',  // purple
+    pants:      '#4a0a6a',
     skin:       '#e8c4a0',
-    hair:       '#1a1a1a',
-    shoe:       '#0a0a0a',
+    hair:       '#6a4020',  // warm brown
+    shoe:       '#2a0a3a',
     hasGlasses: true,
     hasBeard:   false,
     hasHat:     true,
-    hat:        '#4a2a5a',
+    hat:        '#1a1a1a',  // large dark witch hat
   },
   {
     id: 'kathleen',
     name: 'Kathleen Locke',
     tagline: 'Board Director, Editor',
     portrait:   null,
-    shirt:      '#2a1a0a',
-    pants:      '#1a1a1a',
-    skin:       '#c8956c',
-    hair:       '#5a2a0a',
-    shoe:       '#0a0a0a',
+    shirt:      '#2a4a6a',  // blue shirt
+    pants:      '#1a2a3a',
+    skin:       '#d4a880',
+    hair:       '#6a3a18',  // warm curly brown
+    shoe:       '#1a1a1a',
     hasGlasses: true,
     hasBeard:   false,
     hasHat:     false,
@@ -81,10 +82,10 @@ const CHARS = [
     name: 'Michaela Butler',
     tagline: 'Webmaster, Editor',
     portrait:   null,
-    shirt:      '#5a0a1a',
-    pants:      '#2a0a0a',
-    skin:       '#c8a080',
-    hair:       '#1a1a1a',
+    shirt:      '#2a0a18',  // very dark maroon/brown
+    pants:      '#1a0808',
+    skin:       '#c8907a',
+    hair:       '#4a1a6a',  // purple hair!
     shoe:       '#0a0a0a',
     hasGlasses: true,
     hasBeard:   false,
@@ -96,29 +97,30 @@ const CHARS = [
     name: 'CJ the Tall Poet',
     tagline: 'Probationary Member',
     portrait:   null,
-    shirt:      '#5a3010',
-    pants:      '#3a2008',
-    skin:       '#d4a070',
-    hair:       '#1a1a1a',
-    shoe:       '#2a1008',
+    // Cow onesie: white/cream with brown spots
+    shirt:      '#ede8e0',  // off-white onesie
+    pants:      '#ede8e0',
+    skin:       '#4a2810',  // deeper skin tone
+    hair:       '#1a0a00',
+    shoe:       '#ede8e0',  // onesie feet
     hasGlasses: false,
     hasBeard:   false,
     hasHat:     true,
-    hat:        '#2a1808',
+    hat:        '#ede8e0',  // cow-ear hood
   },
   {
     id: 'francis',
     name: 'Francis Wiget',
     tagline: 'Probationary Member',
     portrait:   null,
-    shirt:      '#3a5060',
-    pants:      '#2a3848',
-    skin:       '#d4b090',
-    hair:       '#6a5040',
-    shoe:       '#1a1a2a',
-    hasGlasses: false,
+    shirt:      '#5a3a18',  // tan/brown duster coat
+    pants:      '#3a2810',
+    skin:       '#c8a878',
+    hair:       '#4a3020',
+    shoe:       '#2a1a08',
+    hasGlasses: true,    // dark sunglasses
     hasBeard:   true,
     hasHat:     true,
-    hat:        '#2a3848',
+    hat:        '#1e1e1e',  // very dark wide-brim hat
   },
 ];
