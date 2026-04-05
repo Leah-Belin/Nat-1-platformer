@@ -1,5 +1,17 @@
 'use strict';
 
+// ─── Portrait image cache ─────────────────────────────────────────────────────
+const _portImgs = {};  // char.id → HTMLImageElement
+
+function preloadPortraits() {
+  for (const ch of CHARS) {
+    if (!ch.portrait) continue;
+    const img = new Image();
+    img.src = ch.portrait;  // no crossOrigin — avoids CORS block from CDN
+    _portImgs[ch.id] = img;
+  }
+}
+
 // ─── Palette ──────────────────────────────────────────────────────────────────
 const PAL = {
   brickBase:  '#4a7ea8',
@@ -141,11 +153,11 @@ function drawDice(ctx, dice, t) {
 
 function _drawDie(ctx, x, y, t) {
   const bob = Math.sin(t * 2.2 + x * 0.015) * 3;
-  const r = 11;
+  const r = 12;
   const dy = y + bob;
 
   // Drop shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillStyle = 'rgba(0,0,0,0.40)';
   ctx.beginPath();
   ctx.ellipse(x + 2, dy + r + 3, r * 0.75, 3.5, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -153,7 +165,7 @@ function _drawDie(ctx, x, y, t) {
   ctx.save();
   ctx.translate(x, dy);
 
-  // Pentagon body (d20 face, point up)
+  // ── Pentagon body — dark navy (Nat 1 logo base color) ──
   ctx.beginPath();
   for (let i = 0; i < 5; i++) {
     const a = -Math.PI / 2 + (i / 5) * Math.PI * 2;
@@ -161,34 +173,32 @@ function _drawDie(ctx, x, y, t) {
     else         ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
   }
   ctx.closePath();
-
-  const grd = ctx.createRadialGradient(-r * 0.3, -r * 0.35, 0, 0, 0, r);
-  grd.addColorStop(0,    '#ffffff');
-  grd.addColorStop(0.55, '#e0d4bc');
-  grd.addColorStop(1,    '#a89878');
+  // Slight top-highlight gradient
+  const grd = ctx.createLinearGradient(0, -r, 0, r);
+  grd.addColorStop(0,   '#1e3060');
+  grd.addColorStop(1,   '#0a1428');
   ctx.fillStyle = grd;
   ctx.fill();
-  ctx.strokeStyle = '#2a1808';
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#c8a030';  // gold rim
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // Internal lines from center to each vertex (d20 face detail)
-  ctx.strokeStyle = 'rgba(60,35,10,0.28)';
-  ctx.lineWidth = 0.8;
-  for (let i = 0; i < 5; i++) {
-    const a = -Math.PI / 2 + (i / 5) * Math.PI * 2;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(Math.cos(a) * r * 0.88, Math.sin(a) * r * 0.88);
-    ctx.stroke();
-  }
+  // ── Red downward triangle (Nat 1 logo chevron) ──
+  const tr = r * 0.68;
+  ctx.beginPath();
+  ctx.moveTo(-tr * 0.78, -tr * 0.38);  // top-left
+  ctx.lineTo( tr * 0.78, -tr * 0.38);  // top-right
+  ctx.lineTo( 0,          tr * 0.72);  // bottom point
+  ctx.closePath();
+  ctx.fillStyle = '#c01820';
+  ctx.fill();
 
-  // "20" label
-  ctx.fillStyle = '#1a0800';
-  ctx.font = 'bold 7px "Courier New"';
+  // ── White "1" ──
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 8px "Courier New"';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('20', 0, 1);
+  ctx.fillText('1', 0, 0);
 
   ctx.restore();
 }
@@ -538,12 +548,26 @@ function drawSelect(ctx, t) {
     ctx.lineWidth = selected ? 3 : 1;
     ctx.strokeRect(cx, cy, cardW, cardH);
 
-    // Draw mini character
-    const charCX   = cx + cardW / 2;
-    const charFeetY = cy + 120;
-    ctx.save();
-    _drawChar(ctx, charCX, charFeetY, ch, Math.floor(t * 6) % 4, false, t);
-    ctx.restore();
+    // Draw portrait image if loaded, otherwise fall back to pixel-art character
+    const portImg = _portImgs[ch.id];
+    const portraitAreaH = 120;
+    if (portImg && portImg.complete && portImg.naturalWidth > 0) {
+      const scale = Math.min(cardW / portImg.naturalWidth, portraitAreaH / portImg.naturalHeight);
+      const iw = portImg.naturalWidth  * scale;
+      const ih = portImg.naturalHeight * scale;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(cx, cy, cardW, portraitAreaH);
+      ctx.clip();
+      ctx.drawImage(portImg, cx + (cardW - iw) / 2, cy + (portraitAreaH - ih) / 2, iw, ih);
+      ctx.restore();
+    } else {
+      const charCX    = cx + cardW / 2;
+      const charFeetY = cy + 115;
+      ctx.save();
+      _drawChar(ctx, charCX, charFeetY, ch, Math.floor(t * 6) % 4, false, t);
+      ctx.restore();
+    }
 
     // Name (wrap long names to two lines)
     ctx.fillStyle = selected ? PAL.textYellow : PAL.textWhite;
@@ -581,22 +605,24 @@ function drawSelect(ctx, t) {
 function drawZoneHints(ctx) {
   const zH = 36;
   const zY = CH - zH;
-  const third = CW / 3;
+  const lEdge = CW * 0.25;
+  const rEdge = CW * 0.75;
 
   ctx.save();
-  ctx.globalAlpha = 0.12;
+  ctx.globalAlpha = 0.11;
   ctx.fillStyle = '#4488ff';
-  ctx.fillRect(0,         zY, third, zH);
-  ctx.fillRect(third * 2, zY, third, zH);
+  ctx.fillRect(0,     zY, lEdge,        zH);  // left walk zone
+  ctx.fillRect(rEdge, zY, CW - rEdge,   zH);  // right walk zone
   ctx.fillStyle = '#44cc88';
-  ctx.fillRect(third,     zY, third, zH);
-  ctx.globalAlpha = 0.45;
+  ctx.fillRect(lEdge, zY, rEdge - lEdge, zH); // center tap zone
+
+  ctx.globalAlpha = 0.50;
   ctx.fillStyle = '#ffffff';
-  ctx.font = '13px "Courier New"';
+  ctx.font = '11px "Courier New"';
   ctx.textAlign = 'center';
-  ctx.fillText('◀',    third / 2,          zY + 23);
-  ctx.fillText('JUMP', CW / 2,              zY + 23);
-  ctx.fillText('▶',    third * 2 + third / 2, zY + 23);
+  ctx.fillText('HOLD ◀',              lEdge / 2,          zY + 23);
+  ctx.fillText('TAP: JUMP / LADDER',  CW / 2,             zY + 23);
+  ctx.fillText('HOLD ▶',              rEdge + (CW - rEdge) / 2, zY + 23);
   ctx.restore();
 }
 

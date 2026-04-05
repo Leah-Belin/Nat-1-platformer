@@ -26,6 +26,7 @@ window.addEventListener('load', () => {
   ctx    = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   initInput();
+  preloadPortraits();
 
   // Win overlay "Play Again" button
   const winAgain = document.getElementById('win-again');
