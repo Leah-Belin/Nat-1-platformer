@@ -1,11 +1,8 @@
 'use strict';
 
 // ── Nat 1 Publishing Board Members ───────────────────────────────────────────
-// Portrait URLs use the WordPress Photon CDN; if a URL 404s the card falls back
-// to the pixel-art character automatically.
-const BASE = 'https://i0.wp.com/nat1publishing.com/wp-content/uploads/2022/07/';
-const PORT = (file) => `${BASE}${file}?w=300&ssl=1`;
-
+// Portrait URLs use the WordPress Photon CDN. If a URL fails the card
+// falls back to the pixel-art character automatically.
 const CHARS = [
   // ── Voting Board ─────────────────────────────────────────────────────
   {
@@ -42,11 +39,11 @@ const CHARS = [
     name: 'Jason Willard',
     tagline: 'Creative Director',
     portrait:   PORT('JasonWillard_Portrait2.png'),
-    shirt:      '#2a3a7a',
+    shirt:      '#2a3a8a',  // blue patterned blazer
     pants:      '#1a2a5a',
-    skin:       '#d4a070',
-    hair:       '#1a0a00',
-    shoe:       '#0a0a0a',
+    skin:       '#d4a07a',
+    hair:       '#7a3a18',  // auburn/brown
+    shoe:       '#1a1a1a',
     hasGlasses: true,
     hasBeard:   true,
     hasHat:     false,
