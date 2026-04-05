@@ -131,47 +131,64 @@ function drawLadders(ctx, ladders) {
   }
 }
 
-// ─── Coins ────────────────────────────────────────────────────────────────────
-function drawCoins(ctx, coins, t) {
-  for (const c of coins) {
-    if (c.collected) continue;
-    _drawCoin(ctx, c.x, c.y, t);
+// ─── Dice (d20) ───────────────────────────────────────────────────────────────
+function drawDice(ctx, dice, t) {
+  for (const d of dice) {
+    if (d.collected) continue;
+    _drawDie(ctx, d.x, d.y, t);
   }
 }
 
-function _drawCoin(ctx, x, y, t) {
-  // Animate a squeeze (like it's rotating)
-  const scaleX = Math.abs(Math.cos(t * 3 + x * 0.01));
-  const r = 10;
-  const w = Math.max(2, r * 2 * scaleX);
+function _drawDie(ctx, x, y, t) {
+  const bob = Math.sin(t * 2.2 + x * 0.015) * 3;
+  const r = 11;
+  const dy = y + bob;
+
+  // Drop shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(x + 2, dy + r + 3, r * 0.75, 3.5, 0, 0, Math.PI * 2);
+  ctx.fill();
 
   ctx.save();
-  ctx.translate(x, y);
+  ctx.translate(x, dy);
 
-  // Shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  // Pentagon body (d20 face, point up)
   ctx.beginPath();
-  ctx.ellipse(2, r + 2, w / 2, 4, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Coin body
-  ctx.fillStyle = PAL.coinEdge;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, w / 2 + 1, r + 1, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = PAL.coinGold;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, w / 2, r, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Shine
-  if (scaleX > 0.3) {
-    ctx.fillStyle = PAL.coinLight;
-    ctx.beginPath();
-    ctx.ellipse(-w * 0.15, -r * 0.3, w * 0.15, r * 0.35, 0, 0, Math.PI * 2);
-    ctx.fill();
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + (i / 5) * Math.PI * 2;
+    if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    else         ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
   }
+  ctx.closePath();
+
+  const grd = ctx.createRadialGradient(-r * 0.3, -r * 0.35, 0, 0, 0, r);
+  grd.addColorStop(0,    '#ffffff');
+  grd.addColorStop(0.55, '#e0d4bc');
+  grd.addColorStop(1,    '#a89878');
+  ctx.fillStyle = grd;
+  ctx.fill();
+  ctx.strokeStyle = '#2a1808';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Internal lines from center to each vertex (d20 face detail)
+  ctx.strokeStyle = 'rgba(60,35,10,0.28)';
+  ctx.lineWidth = 0.8;
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + (i / 5) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(a) * r * 0.88, Math.sin(a) * r * 0.88);
+    ctx.stroke();
+  }
+
+  // "20" label
+  ctx.fillStyle = '#1a0800';
+  ctx.font = 'bold 7px "Courier New"';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('20', 0, 1);
 
   ctx.restore();
 }
@@ -350,6 +367,17 @@ function _drawChar(ctx, cx, feet, char, frame, onLadder, t) {
   ctx.fillRect(cx - 5*S/2 - 1, feet - 46, 5*S + 2, 6);  // top
   ctx.fillRect(cx - 5*S/2 - 1, feet - 44, 2, 8);          // left sideburn
 
+  // ── Hat ──
+  if (char.hasHat) {
+    const hc = char.hat || char.hair;
+    ctx.fillStyle = hc;
+    ctx.fillRect(cx - 6*S/2 - 1, feet - 47, 6*S + 2, 3);  // brim
+    ctx.fillRect(cx - 4*S/2,     feet - 55, 4*S,      9);  // crown
+    // Crown highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(cx - 4*S/2 + 1, feet - 54, 2, 7);
+  }
+
   // ── Glasses ──
   if (char.hasGlasses) {
     ctx.fillStyle = '#1a1a1a';
@@ -468,13 +496,14 @@ function drawTitle(ctx, t) {
   if (Math.floor(t * 2) % 2 === 0) {
     ctx.fillStyle = PAL.textWhite;
     ctx.font = 'bold 16px "Courier New"';
-    ctx.fillText('PRESS  ENTER  OR  SPACE  TO  START', CW / 2, 380);
+    ctx.fillText('CLICK  ·  TAP  ·  OR  PRESS  SPACE  TO  START', CW / 2, 380);
   }
 
   ctx.fillStyle = PAL.textGray;
   ctx.font = '12px "Courier New"';
-  ctx.fillText('ARROWS / WASD  ·  SPACE TO JUMP  ·  COLLECT ALL COINS', CW / 2, 440);
-  ctx.fillText('HI-SCORE  ' + String(State.hiScore).padStart(8,'0'), CW / 2, 470);
+  ctx.fillText('TAP ZONES: [ ◀ LEFT ] [ ▲ JUMP ] [ RIGHT ▶ ]', CW / 2, 440);
+  ctx.fillText('OR USE  ARROWS / WASD + SPACE  ·  COLLECT ALL DICE', CW / 2, 460);
+  ctx.fillText('HI-SCORE  ' + String(State.hiScore).padStart(8,'0'), CW / 2, 490);
 
   ctx.textAlign = 'left';
 }
@@ -487,15 +516,19 @@ function drawSelect(ctx, t) {
 
   ctx.textAlign = 'center';
   ctx.fillStyle = PAL.textYellow;
-  ctx.font = 'bold 26px "Courier New"';
-  ctx.fillText('CHOOSE  YOUR  CHARACTER', CW / 2, GY + 50);
+  ctx.font = 'bold 22px "Courier New"';
+  ctx.fillText('CHOOSE  YOUR  CHARACTER', CW / 2, GY + 36);
 
-  const cardW = 160, cardH = 200;
-  const startX = (CW - (CHARS.length * cardW + (CHARS.length - 1) * 16)) / 2;
+  const PER_ROW = 4;
+  const cardW = 160, cardH = 175, gap = 12;
+  const rowW  = PER_ROW * cardW + (PER_ROW - 1) * gap;
+  const startX = (CW - rowW) / 2;
 
   CHARS.forEach((ch, i) => {
-    const cx = startX + i * (cardW + 16);
-    const cy = GY + 70;
+    const col = i % PER_ROW;
+    const row = Math.floor(i / PER_ROW);
+    const cx  = startX + col * (cardW + gap);
+    const cy  = GY + 52 + row * (cardH + 10);
     const selected = i === State.selectedChar;
 
     // Card background
@@ -506,36 +539,65 @@ function drawSelect(ctx, t) {
     ctx.strokeRect(cx, cy, cardW, cardH);
 
     // Draw mini character
-    const charCX = cx + cardW / 2;
-    const charFeetY = cy + 140;
+    const charCX   = cx + cardW / 2;
+    const charFeetY = cy + 120;
     ctx.save();
     _drawChar(ctx, charCX, charFeetY, ch, Math.floor(t * 6) % 4, false, t);
     ctx.restore();
 
-    // Name
+    // Name (wrap long names to two lines)
     ctx.fillStyle = selected ? PAL.textYellow : PAL.textWhite;
-    ctx.font = `bold ${selected ? 14 : 12}px "Courier New"`;
-    ctx.fillText(ch.name, cx + cardW / 2, cy + 160);
-    ctx.fillStyle = PAL.textGray;
-    ctx.font = '11px "Courier New"';
-    ctx.fillText(ch.tagline, cx + cardW / 2, cy + 178);
+    ctx.font = `bold 10px "Courier New"`;
+    const words  = ch.name.split(' ');
+    const half   = Math.ceil(words.length / 2);
+    const line1  = words.slice(0, half).join(' ');
+    const line2  = words.slice(half).join(' ');
+    ctx.fillText(line1, cx + cardW / 2, cy + 136);
+    if (line2) ctx.fillText(line2, cx + cardW / 2, cy + 148);
 
-    // Cursor arrows
+    ctx.fillStyle = PAL.textGray;
+    ctx.font = '9px "Courier New"';
+    ctx.fillText(ch.tagline, cx + cardW / 2, cy + 162);
+
+    // Selected indicator
     if (selected) {
       ctx.fillStyle = PAL.textYellow;
-      ctx.font = 'bold 20px "Courier New"';
-      ctx.fillText('▲', cx + cardW / 2, cy - 12);
+      ctx.font = 'bold 16px "Courier New"';
+      ctx.fillText('▲', cx + cardW / 2, cy - 8);
     }
   });
 
-  // Blink confirm prompt
+  // Blink confirm prompt (below both rows)
   if (Math.floor(t * 2) % 2 === 0) {
     ctx.fillStyle = PAL.textWhite;
-    ctx.font = 'bold 15px "Courier New"';
-    ctx.fillText('← →  TO SELECT     ENTER / SPACE  TO  CONFIRM', CW / 2, GY + 300);
+    ctx.font = 'bold 13px "Courier New"';
+    ctx.fillText('[ ◀ ] [ ▶ ]  SELECT   ·   CENTER ZONE / SPACE  CONFIRM', CW / 2, GY + 490);
   }
 
   ctx.textAlign = 'left';
+}
+
+// ─── Control zone hints ───────────────────────────────────────────────────────
+function drawZoneHints(ctx) {
+  const zH = 36;
+  const zY = CH - zH;
+  const third = CW / 3;
+
+  ctx.save();
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = '#4488ff';
+  ctx.fillRect(0,         zY, third, zH);
+  ctx.fillRect(third * 2, zY, third, zH);
+  ctx.fillStyle = '#44cc88';
+  ctx.fillRect(third,     zY, third, zH);
+  ctx.globalAlpha = 0.45;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '13px "Courier New"';
+  ctx.textAlign = 'center';
+  ctx.fillText('◀',    third / 2,          zY + 23);
+  ctx.fillText('JUMP', CW / 2,              zY + 23);
+  ctx.fillText('▶',    third * 2 + third / 2, zY + 23);
+  ctx.restore();
 }
 
 // ─── Overlay screens (dead / win / gameover) ──────────────────────────────────
@@ -579,9 +641,10 @@ function render(ctx, player, coins, enemies, t) {
   drawBackground(ctx);
   drawLadders(ctx, LADDERS);
   drawPlatforms(ctx, PLATFORMS);
-  drawCoins(ctx, coins, t);
+  drawDice(ctx, coins, t);
   drawEnemies(ctx, enemies, t);
   drawPlayer(ctx, player, CHARS[State.selectedChar], t);
+  drawZoneHints(ctx);
   drawHUD(ctx, State);
 
   if (phase === 'dead') {
