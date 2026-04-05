@@ -7,9 +7,7 @@ function preloadPortraits() {
   for (const ch of CHARS) {
     if (!ch.portrait) continue;
     const img = new Image();
-    // crossOrigin lets drawImage work even for same-site external images
-    img.crossOrigin = 'anonymous';
-    img.src = ch.portrait;
+    img.src = ch.portrait;  // no crossOrigin — avoids CORS block from CDN
     _portImgs[ch.id] = img;
   }
 }
@@ -155,11 +153,11 @@ function drawDice(ctx, dice, t) {
 
 function _drawDie(ctx, x, y, t) {
   const bob = Math.sin(t * 2.2 + x * 0.015) * 3;
-  const r = 11;
+  const r = 12;
   const dy = y + bob;
 
   // Drop shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillStyle = 'rgba(0,0,0,0.40)';
   ctx.beginPath();
   ctx.ellipse(x + 2, dy + r + 3, r * 0.75, 3.5, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -167,7 +165,7 @@ function _drawDie(ctx, x, y, t) {
   ctx.save();
   ctx.translate(x, dy);
 
-  // Pentagon body (d20 face, point up)
+  // ── Pentagon body — dark navy (Nat 1 logo base color) ──
   ctx.beginPath();
   for (let i = 0; i < 5; i++) {
     const a = -Math.PI / 2 + (i / 5) * Math.PI * 2;
@@ -175,34 +173,32 @@ function _drawDie(ctx, x, y, t) {
     else         ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
   }
   ctx.closePath();
-
-  const grd = ctx.createRadialGradient(-r * 0.3, -r * 0.35, 0, 0, 0, r);
-  grd.addColorStop(0,    '#ffffff');
-  grd.addColorStop(0.55, '#e0d4bc');
-  grd.addColorStop(1,    '#a89878');
+  // Slight top-highlight gradient
+  const grd = ctx.createLinearGradient(0, -r, 0, r);
+  grd.addColorStop(0,   '#1e3060');
+  grd.addColorStop(1,   '#0a1428');
   ctx.fillStyle = grd;
   ctx.fill();
-  ctx.strokeStyle = '#2a1808';
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#c8a030';  // gold rim
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // Internal lines from center to each vertex (d20 face detail)
-  ctx.strokeStyle = 'rgba(60,35,10,0.28)';
-  ctx.lineWidth = 0.8;
-  for (let i = 0; i < 5; i++) {
-    const a = -Math.PI / 2 + (i / 5) * Math.PI * 2;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(Math.cos(a) * r * 0.88, Math.sin(a) * r * 0.88);
-    ctx.stroke();
-  }
+  // ── Red downward triangle (Nat 1 logo chevron) ──
+  const tr = r * 0.68;
+  ctx.beginPath();
+  ctx.moveTo(-tr * 0.78, -tr * 0.38);  // top-left
+  ctx.lineTo( tr * 0.78, -tr * 0.38);  // top-right
+  ctx.lineTo( 0,          tr * 0.72);  // bottom point
+  ctx.closePath();
+  ctx.fillStyle = '#c01820';
+  ctx.fill();
 
-  // "20" label
-  ctx.fillStyle = '#1a0800';
-  ctx.font = 'bold 7px "Courier New"';
+  // ── White "1" ──
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 8px "Courier New"';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('20', 0, 1);
+  ctx.fillText('1', 0, 0);
 
   ctx.restore();
 }
