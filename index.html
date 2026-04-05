@@ -10,18 +10,14 @@
   <div id="wrap">
     <canvas id="c" width="800" height="600"></canvas>
 
-    <!-- Touch controls (shown only on touch devices via JS) -->
-    <div id="touch-ui">
-      <div id="dpad">
-        <button class="tbtn" id="tbtn-up">▲</button>
-        <div class="dpad-row">
-          <button class="tbtn" id="tbtn-left">◀</button>
-          <button class="tbtn" id="tbtn-down">▼</button>
-          <button class="tbtn" id="tbtn-right">▶</button>
-        </div>
-      </div>
-      <div id="action-pad">
-        <button class="tbtn tbtn-jump" id="tbtn-jump">JUMP</button>
+    <!-- Win overlay — shown when all dice are collected -->
+    <div id="win-overlay">
+      <div id="win-box">
+        <div id="win-title">YOU WIN!</div>
+        <a id="win-link" href="https://nat1publishing.com/" target="_blank" rel="noopener">
+          Visit Nat 1 Publishing →
+        </a>
+        <button id="win-again">Play Again</button>
       </div>
     </div>
   </div>

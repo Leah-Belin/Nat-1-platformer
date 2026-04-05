@@ -1,11 +1,35 @@
 'use strict';
 
 // ─── Key state ────────────────────────────────────────────────────────────────
-const _keys     = {};   // currently held
-const _pressed  = {};   // became pressed this frame (consumed on read)
+const _keys    = {};  // currently held
+const _pressed = {};  // became pressed this frame (consumed on read)
+
+// ─── Canvas zone controls ─────────────────────────────────────────────────────
+// Canvas is split into three horizontal zones:
+//   Left  third  (0 – 33%)  → ArrowLeft
+//   Center third (33 – 67%) → Space (jump / confirm)
+//   Right  third (67 – 100%)→ ArrowRight
+// Works with both mouse (desktop) and touch (mobile).
+
+const _pointerZones = {};  // pointerId → 'left' | 'center' | 'right'
+
+function _zoneCode(zone) {
+  if (zone === 'left')   return 'ArrowLeft';
+  if (zone === 'right')  return 'ArrowRight';
+  return 'Space';
+}
+
+function _releasePointer(id) {
+  const zone = _pointerZones[id];
+  if (!zone) return;
+  delete _pointerZones[id];
+  // Only clear the key if no other active pointer occupies the same zone
+  const stillHeld = Object.values(_pointerZones).includes(zone);
+  if (!stillHeld) _keys[_zoneCode(zone)] = false;
+}
 
 function initInput() {
-  // Keyboard
+  // ── Keyboard ──
   window.addEventListener('keydown', e => {
     if (!_keys[e.code]) _pressed[e.code] = true;
     _keys[e.code] = true;
@@ -13,59 +37,27 @@ function initInput() {
       e.preventDefault();
     }
   });
-  window.addEventListener('keyup', e => {
-    _keys[e.code] = false;
-  });
+  window.addEventListener('keyup', e => { _keys[e.code] = false; });
 
-  // Touch controls
-  _setupTouchControls();
-}
+  // ── Canvas zone pointer events (mouse + touch) ──
+  const c = document.getElementById('c');
 
-// Map touch button IDs → key codes they emulate
-const _TOUCH_MAP = [
-  ['tbtn-up',    'ArrowUp'],
-  ['tbtn-down',  'ArrowDown'],
-  ['tbtn-left',  'ArrowLeft'],
-  ['tbtn-right', 'ArrowRight'],
-  ['tbtn-jump',  'Space'],
-];
-
-function _setupTouchControls() {
-  // Only wire up if we have touch capability
-  const hasTouchUI = document.getElementById('touch-ui');
-  if (!hasTouchUI) return;
-
-  // Show on coarse-pointer (touch) devices
-  if (window.matchMedia('(pointer: coarse)').matches) {
-    hasTouchUI.style.display = 'block';
-  }
-
-  for (const [id, code] of _TOUCH_MAP) {
-    const el = document.getElementById(id);
-    if (!el) continue;
-
-    el.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      _keys[code]    = true;
-      _pressed[code] = true;
-      // Capture so pointerup fires even if finger slides off
-      el.setPointerCapture(e.pointerId);
-    }, { passive: false });
-
-    el.addEventListener('pointerup', e => {
-      e.preventDefault();
-      _keys[code] = false;
-    }, { passive: false });
-
-    el.addEventListener('pointercancel', () => {
-      _keys[code] = false;
-    });
-  }
-
-  // Prevent the canvas from triggering browser scroll / zoom on touch
-  document.getElementById('c').addEventListener('touchstart', e => {
+  c.addEventListener('pointerdown', e => {
     e.preventDefault();
+    const rect = c.getBoundingClientRect();
+    const x    = (e.clientX - rect.left) * (c.width / rect.width);
+    const zone = x < c.width / 3 ? 'left'
+               : x > c.width * 2 / 3 ? 'right'
+               : 'center';
+    _pointerZones[e.pointerId] = zone;
+    c.setPointerCapture(e.pointerId);
+    const code = _zoneCode(zone);
+    if (!_keys[code]) _pressed[code] = true;
+    _keys[code] = true;
   }, { passive: false });
+
+  c.addEventListener('pointerup',     e => { e.preventDefault(); _releasePointer(e.pointerId); }, { passive: false });
+  c.addEventListener('pointercancel', e => { _releasePointer(e.pointerId); });
 }
 
 // ─── Input snapshot (called each frame) ──────────────────────────────────────
@@ -80,7 +72,6 @@ function getInput() {
     _pressed['Space'] || _pressed['ArrowUp'] || _pressed['KeyW']
   );
 
-  // Directional "just pressed" for menus
   const leftJust  = !!_pressed['ArrowLeft'];
   const rightJust = !!_pressed['ArrowRight'];
   const upJust    = !!_pressed['ArrowUp'];

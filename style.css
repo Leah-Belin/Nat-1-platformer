@@ -28,75 +28,65 @@ canvas {
   touch-action: none;
 }
 
-/* ── Touch controls ───────────────────────────────────────── */
-#touch-ui {
+/* ── Win overlay ──────────────────────────────────────────── */
+#win-overlay {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  display: none;           /* shown via JS on touch devices */
-}
-
-.tbtn {
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.30);
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.80);
-  font-size: min(22px, 5vmin);
-  display: flex;
+  display: none;   /* shown via JS when game is won */
   align-items: center;
   justify-content: center;
+  background: rgba(0, 0, 10, 0.72);
   pointer-events: all;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  cursor: pointer;
-  width:  min(64px, 14vmin);
-  height: min(64px, 14vmin);
-  -webkit-tap-highlight-color: transparent;
 }
 
-.tbtn:active {
-  background: rgba(255, 255, 255, 0.38);
-  border-color: rgba(255, 255, 255, 0.55);
-}
-
-/* D-pad — bottom left */
-#dpad {
-  position: absolute;
-  bottom: min(28px, 5%);
-  left:   min(28px, 5%);
+#win-box {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: min(6px, 1.5vmin);
-  pointer-events: none;
+  align-items: center;
+  gap: min(16px, 3vmin);
+  background: rgba(0, 0, 30, 0.92);
+  border: 3px solid #ffd700;
+  border-radius: 12px;
+  padding: min(32px, 5vmin) min(48px, 7vmin);
 }
 
-.dpad-row {
-  display: flex;
-  gap: min(6px, 1.5vmin);
-}
-
-/* Jump — bottom right */
-#action-pad {
-  position: absolute;
-  bottom: min(28px, 5%);
-  right:  min(28px, 5%);
-  pointer-events: none;
-}
-
-.tbtn-jump {
-  width:  min(90px, 20vmin) !important;
-  height: min(90px, 20vmin) !important;
-  border-radius: 50%;
-  font-size: min(13px, 3vmin) !important;
+#win-title {
+  font-size: min(52px, 10vmin);
   font-weight: bold;
-  letter-spacing: 1px;
-  background: rgba(220, 60, 60, 0.28);
-  border-color: rgba(255, 120, 120, 0.45);
-  color: rgba(255, 200, 200, 0.90);
+  color: #ffd700;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
 }
 
-.tbtn-jump:active {
-  background: rgba(255, 80, 80, 0.50);
+#win-link {
+  display: inline-block;
+  padding: min(10px, 2vmin) min(24px, 4vmin);
+  background: #ffd700;
+  color: #0a0a14;
+  font-weight: bold;
+  font-size: min(16px, 3vmin);
+  border-radius: 6px;
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: background 0.15s;
+}
+
+#win-link:hover { background: #ffe840; }
+
+#win-again {
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.75);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: min(13px, 2.5vmin);
+  padding: min(8px, 1.5vmin) min(20px, 3vmin);
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+#win-again:hover {
+  border-color: rgba(255,255,255,0.7);
+  color: #ffffff;
 }

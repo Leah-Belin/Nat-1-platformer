@@ -26,6 +26,15 @@ window.addEventListener('load', () => {
   ctx    = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   initInput();
+
+  // Win overlay "Play Again" button
+  const winAgain = document.getElementById('win-again');
+  if (winAgain) {
+    winAgain.addEventListener('click', () => {
+      State.resetFull();
+    });
+  }
+
   requestAnimationFrame(loop);
 });
 
@@ -99,6 +108,10 @@ function loop(ts) {
       if (inp.enterJust || State.winTimer <= 0) State.resetFull();
       break;
   }
+
+  // Keep win overlay in sync with game phase
+  const _wo = document.getElementById('win-overlay');
+  if (_wo) _wo.style.display = State.phase === 'win' ? 'flex' : 'none';
 
   render(ctx, player, coins, enemies, gameTime);
   flushPressed();
@@ -200,8 +213,8 @@ function _updateOnLadder(dt, inp) {
   player.y += player.vy * dt;
   player.x += player.vx * dt;
 
-  // Exit top of ladder
-  if (player.y + PH <= lad.y + 4) {
+  // Exit top of ladder (only when moving upward)
+  if (player.vy < 0 && player.y + PH <= lad.y + 4) {
     player.y = lad.y - PH;
     player.vy = 0;
     player.onLadder  = false;
@@ -209,8 +222,8 @@ function _updateOnLadder(dt, inp) {
     player.onGround  = true;
     return;
   }
-  // Exit bottom of ladder
-  if (player.y + PH >= lad.y + lad.h + PH) {
+  // Exit bottom of ladder (only when moving downward)
+  if (player.vy > 0 && player.y + PH >= lad.y + lad.h) {
     player.onLadder  = false;
     player.ladderRef = null;
     player.vy = 0;
