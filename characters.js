@@ -1,34 +1,37 @@
 'use strict';
 
 // ── Nat 1 Publishing Board Members ───────────────────────────────────────────
-// To use portrait images: save each image to a portraits/ folder in the project
-// (e.g. portraits/brandan.png) then set portrait: 'portraits/brandan.png'
+// Portrait URLs use the WordPress Photon CDN; if a URL 404s the card falls back
+// to the pixel-art character automatically.
+const BASE = 'https://i0.wp.com/nat1publishing.com/wp-content/uploads/2022/07/';
+const PORT = (file) => `${BASE}${file}?w=300&ssl=1`;
+
 const CHARS = [
   // ── Voting Board ─────────────────────────────────────────────────────
   {
     id: 'brandan',
     name: 'Brandan Roberts',
     tagline: 'Board President',
-    portrait:   null,  // save image as portraits/brandan.png
-    shirt:      '#2a62a0',  // blue shirt + tie
+    portrait:   PORT('BrandanRoberts_Portrait1.png'),
+    shirt:      '#2a62a0',
     pants:      '#1a1a2a',
     skin:       '#c8825a',
-    hair:       '#2a1a10',  // dark brown, long-ish
+    hair:       '#2a1a10',
     shoe:       '#1a1a1a',
     hasGlasses: true,
     hasBeard:   true,
     hasHat:     true,
-    hat:        '#1a1a1a',  // flat dark cap
+    hat:        '#1a1a1a',
   },
   {
     id: 'dahlia',
     name: 'Dahlia Thomas',
     tagline: 'Board Director',
-    portrait:   null,
-    shirt:      '#2a2a3a',  // dark scarf/collar
+    portrait:   PORT('DahliaThomas_Portrait1.png'),
+    shirt:      '#2a2a3a',
     pants:      '#1a0a2a',
     skin:       '#e0b090',
-    hair:       '#2a1008',  // rich dark brown, wavy
+    hair:       '#2a1008',
     shoe:       '#0a0a0a',
     hasGlasses: false,
     hasBeard:   false,
@@ -38,7 +41,7 @@ const CHARS = [
     id: 'jason',
     name: 'Jason Willard',
     tagline: 'Creative Director',
-    portrait:   null,
+    portrait:   PORT('JasonWillard_Portrait2.png'),
     shirt:      '#2a3a7a',
     pants:      '#1a2a5a',
     skin:       '#d4a070',
@@ -52,26 +55,26 @@ const CHARS = [
     id: 'jennifer',
     name: 'Jennifer Weigel',
     tagline: 'Board Director, Artist',
-    portrait:   null,
-    shirt:      '#6a1a8a',  // purple
+    portrait:   PORT('JenniferWeigel_Portrait1.png'),
+    shirt:      '#6a1a8a',
     pants:      '#4a0a6a',
     skin:       '#e8c4a0',
-    hair:       '#6a4020',  // warm brown
+    hair:       '#6a4020',
     shoe:       '#2a0a3a',
     hasGlasses: true,
     hasBeard:   false,
     hasHat:     true,
-    hat:        '#1a1a1a',  // large dark witch hat
+    hat:        '#1a1a1a',
   },
   {
     id: 'kathleen',
     name: 'Kathleen Locke',
     tagline: 'Board Director, Editor',
-    portrait:   null,
-    shirt:      '#2a4a6a',  // blue shirt
+    portrait:   PORT('KathleenLocke_Portrait1.png'),
+    shirt:      '#2a4a6a',
     pants:      '#1a2a3a',
     skin:       '#d4a880',
-    hair:       '#6a3a18',  // warm curly brown
+    hair:       '#6a3a18',
     shoe:       '#1a1a1a',
     hasGlasses: true,
     hasBeard:   false,
@@ -81,11 +84,11 @@ const CHARS = [
     id: 'michaela',
     name: 'Michaela Butler',
     tagline: 'Webmaster, Editor',
-    portrait:   null,
-    shirt:      '#2a0a18',  // very dark maroon/brown
+    portrait:   PORT('MichaelaButler_Portrait1.png'),
+    shirt:      '#2a0a18',
     pants:      '#1a0808',
     skin:       '#c8907a',
-    hair:       '#4a1a6a',  // purple hair!
+    hair:       '#4a1a6a',
     shoe:       '#0a0a0a',
     hasGlasses: true,
     hasBeard:   false,
@@ -96,31 +99,30 @@ const CHARS = [
     id: 'cj',
     name: 'CJ the Tall Poet',
     tagline: 'Probationary Member',
-    portrait:   null,
-    // Cow onesie: white/cream with brown spots
-    shirt:      '#ede8e0',  // off-white onesie
+    portrait:   PORT('CJtheTallPoet_Portrait1.png'),
+    shirt:      '#ede8e0',
     pants:      '#ede8e0',
-    skin:       '#4a2810',  // deeper skin tone
+    skin:       '#4a2810',
     hair:       '#1a0a00',
-    shoe:       '#ede8e0',  // onesie feet
+    shoe:       '#ede8e0',
     hasGlasses: false,
     hasBeard:   false,
     hasHat:     true,
-    hat:        '#ede8e0',  // cow-ear hood
+    hat:        '#ede8e0',
   },
   {
     id: 'francis',
     name: 'Francis Wiget',
     tagline: 'Probationary Member',
-    portrait:   null,
-    shirt:      '#5a3a18',  // tan/brown duster coat
+    portrait:   PORT('FrancisWiget_Portrait1.png'),
+    shirt:      '#5a3a18',
     pants:      '#3a2810',
     skin:       '#c8a878',
     hair:       '#4a3020',
     shoe:       '#2a1a08',
-    hasGlasses: true,    // dark sunglasses
+    hasGlasses: true,
     hasBeard:   true,
     hasHat:     true,
-    hat:        '#1e1e1e',  // very dark wide-brim hat
+    hat:        '#1e1e1e',
   },
 ];
