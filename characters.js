@@ -38,7 +38,7 @@ const CHARS = [
     id: 'jason',
     name: 'Jason Willard',
     tagline: 'Creative Director',
-    portrait:   'https://i0.wp.com/nat1publishing.com/wp-content/uploads/2022/07/JasonWillard_Portrait2.png?w=300&ssl=1',
+    portrait:   'https://i0.wp.com/nat1publishing.com/wp-content/uploads/2022/03/JasonW.png?w=300&ssl=1',
     shirt:      '#2a3a8a',  // blue patterned blazer
     pants:      '#1a2a5a',
     skin:       '#d4a07a',
